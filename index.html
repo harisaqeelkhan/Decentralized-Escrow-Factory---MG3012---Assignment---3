@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decentralized Escrow DApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/blockies-identicon@0.1.0/blockies.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-logo">
+            <h1>Decentralized Escrow Factory</h1>
+        </div>
+        <nav class="header-nav">
+            <button class="nav-btn active" data-page="home">Home</button>
+            <button class="nav-btn" data-page="my-deals">My Deals</button>
+            <button class="nav-btn" data-page="create">Create New Deal</button>
+            <button class="nav-btn" data-page="view">View Existing Deal</button>
+            <button class="nav-btn" data-page="all-deals">Deal Log</button> 
+        </nav>
+        <div class="account-display">
+            <button id="accountButton"><span id="accountBlockie"></span>Connecting...</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="home" class="page active">
+            <div class="home-content">
+                <h2>Welcome to the Decentralized Escrow Factory</h2>
+                <p>This DApp is a trustless, peer-to-peer escrow service built on the Ethereum blockchain. It's an "Upwork Killer" designed to replace expensive middlemen.</p>
+                <h3>How It Works</h3>
+                <ol>
+                    <li><strong>Create Deal:</strong> A buyer and seller (or a third party) set the terms of a deal: the buyer, seller, arbiter, and the exact ETH amount.</li>
+                    <li><strong>Fund Deal:</strong> The buyer deposits the agreed-upon ETH into a new, unique, and secure smart contract. The funds are now locked.</li>
+                    <li><strong>Complete Deal:</strong> The seller, seeing the funds are locked, delivers the goods or services.</li>
+                    <li><strong>Release or Refund:</strong>
+                        <ul>
+                            <li><strong>Happy Path:</strong> The buyer clicks "Release Funds" to instantly pay the seller.</li>
+                            <li><strong>Dispute Path:</strong> If there's a problem, the mutual "Arbiter" can step in to "Refund Funds" to the buyer or "Release" them to the seller.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="my-deals" class="page">
+            <h2>My Deals Dashboard</h2>
+            <p>This page scans the blockchain for all deals where your connected wallet is the Buyer, Seller, or Arbiter.</p>
+            <button id="refreshMyDealsButton">Refresh My Deals</button>
+            <table id="myDealsTable">
+                <thead>
+                    <tr>
+                        <th>Tag #</th>
+                        <th>My Role</th>
+                        <th>Status</th>
+                        <th>Deal Contract Address</th>
+                        <th>Copy</th>
+                    </tr>
+                </thead>
+                <tbody id="myDealsList"></tbody>
+            </table>
+        </div>
+
+        <div id="create" class="page">
+            <h2>Create a New Escrow Deal</h2>
+            <form id="createEscrowForm">
+                <label for="buyerAddress">Buyer's Address:</label>
+                <input type="text" id="buyerAddress" placeholder="0x..." required>
+                <label for="sellerAddress">Seller's Address:</label>
+                <input type="text" id="sellerAddress" placeholder="0x..." required>
+                <label for="arbiterAddress">Arbiter's Address:</label>
+                <input type="text" id="arbiterAddress" placeholder="0x..." required>
+                <label for="dealAmount">Deal Amount (in ETH):</label>
+                <input type="number" id="dealAmount" step="0.01" placeholder="e.g., 1.5" required>
+                <label for="dealDescription">Deal Description:</label>
+                <input type="text" id="dealDescription" placeholder="e.g., 'Build small website'" required>
+                <button type="submit">Create Deal</button>
+            </form>
+            <div id="new-deal-box" style="display:none; margin-top: 20px;">
+                <h3>✅ Success! New Deal Created.</h3>
+                <p>Share this address with the Buyer and Seller:</p>
+                <div id="new-deal-address-container">
+                    <span id="new-deal-address"></span>
+                    <button class="copy-btn" id="copyNewDeal">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view" class="page">
+            <h2>View & Interact with a Deal</h2>
+            <form id="viewEscrowForm">
+                <label for="escrowAddress">Enter Deal Contract Address:</label>
+                <input type="text" id="escrowAddress" placeholder="0x..." required>
+                <button type="submit">Load Deal Info</button>
+            </form>
+            <div id="deal-status-box" style="display:none;">
+                <h3>Deal Details</h3>
+                <p><strong>Status:</strong> <span id="deal-status-badge"></span> <span id="deal-status">...</span></p>
+                <p><strong>Description:</strong> <span id="deal-description">...</span></p>
+                <p><strong>Amount:</strong> <span id="deal-amount">...</span> ETH</p>
+                <p><strong>Buyer:</strong> <img id="buyer-blockie" class="blockie-icon"> <span id="deal-buyer">...</span></p>
+                <p><strong>Seller:</strong> <img id="seller-blockie" class="blockie-icon"> <span id="deal-seller">...</span></p>
+                <p><strong>Arbiter:</strong> <img id="arbiter-blockie" class="blockie-icon"> <span id="deal-arbiter">...</span></p>
+                <hr>
+                <div class="deal-actions">
+                    <form id="depositForm" style="display:none;">
+                        <h4>1. Buyer Deposit</h4>
+                        <p>Click below to deposit the agreed-upon amount.</p>
+                        <button type="submit">Deposit Funds</button>
+                    </form>
+                    <hr>
+                    <h4>2. Release or Refund</h4>
+                    <button id="releaseButton">Release Funds (to Seller)</button>
+                    <button id="refundButton">Refund Funds (to Buyer)</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="all-deals" class="page">
+            <h2>Deal Log</h2>
+            <button id="refreshAllDealsButton">Refresh List</button>
+            <table id="allDealsTable">
+                <thead>
+                    <tr>
+                        <th>Tag #</th>
+                        <th>Deal Contract Address</th>
+                        <th>Status</th>
+                        <th>Copy</th> 
+                    </tr>
+                </thead>
+                <tbody id="allDealsList"></tbody>
+            </table>
+        </div>
+
+    </div> <script src="https://cdn.jsdelivr.net/npm/web3@1.7.3/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
