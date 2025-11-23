@@ -1,6 +1,6 @@
 # NFT Minter dApp
 
-## Assignment 2 Information
+## Assignment 3 Information
 - **Student Name:** Muhammad Haris Khan  
 - **Roll Number:** 23i-5558  
 - **Batch:** 23  
